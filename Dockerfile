@@ -3,10 +3,10 @@ RUN echo 'Acquire::http::Proxy "http://proxies.labs:3142/apt-cacher/";' > /etc/a
 RUN apt-get update && apt-get install --no-install-recommends -y make python3 python3-pip python3-distutils
 
 RUN mkdir -p /usr/src 
+WORKDIR /usr/src/app/
 
 RUN python3 -m venv venv
 RUN . venv/bin/activate
-WORKDIR /usr/src/app/
 ADD pyproject.toml .
 ADD poetry.lock .
 RUN venv/bin/pip install poetry
