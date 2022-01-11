@@ -8,4 +8,4 @@ COPY . /usr/src/app/
 WORKDIR /usr/src/app/
 RUN python3 -m venv venv && venv/bin/pip install poetry
 ENTRYPOINT /bin/bash
-RUN make all
+RUN source venv/bin/activate && make all
