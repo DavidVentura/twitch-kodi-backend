@@ -5,7 +5,7 @@ description = ""
 authors = ["david <davidventura27@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7"
 fastapi = "^0.71.0"
 httpx = "^0.21.3"
 streamlink = "^3.0.3"
