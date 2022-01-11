@@ -10,7 +10,7 @@ RUN . venv/bin/activate
 ADD pyproject.toml .
 ADD poetry.lock .
 RUN venv/bin/pip install poetry
-RUN poetry install
+RUN venv/bin/poetry install
 
 COPY . /usr/src/app/
 RUN PATH="$PATH:venv/bin" make all
