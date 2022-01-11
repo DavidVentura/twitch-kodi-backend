@@ -7,8 +7,8 @@ RUN mkdir -p /usr/src
 RUN python3 -m venv venv
 RUN . venv/bin/activate
 WORKDIR /usr/src/app/
-ADD pyproject.toml
-ADD poetry.lock
+ADD pyproject.toml .
+ADD poetry.lock .
 RUN venv/bin/pip install poetry
 RUN poetry install
 
