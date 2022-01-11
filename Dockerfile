@@ -4,9 +4,13 @@ RUN apt-get update && apt-get install --no-install-recommends -y make python3 py
 
 RUN mkdir -p /usr/src 
 
-COPY . /usr/src/app/
-WORKDIR /usr/src/app/
 RUN python3 -m venv venv
 RUN . venv/bin/activate
+WORKDIR /usr/src/app/
+ADD pyproject.toml
+ADD poetry.lock
 RUN venv/bin/pip install poetry
+RUN poetry install
+
+COPY . /usr/src/app/
 RUN PATH="$PATH:venv/bin" make all
