@@ -1,0 +1,13 @@
+{
+  "subprojects": [
+    {
+      "name": "backend",
+      "dir": ".",
+      "artifacts": [
+        "dist/webserver"
+      ],
+      "build_mode": "custom"
+    }
+  ]
+}
+
