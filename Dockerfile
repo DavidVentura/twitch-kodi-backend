@@ -9,4 +9,4 @@ WORKDIR /usr/src/app/
 RUN python3 -m venv venv
 RUN . venv/bin/activate
 RUN venv/bin/pip install poetry
-RUN make all
+RUN PATH="$PATH:venv/bin" make all
