@@ -1,0 +1,5 @@
+[development]
+HIGHLIGHT = ["some", "streamers"]
+KODI_JSONRPC = 'http://coreelec.labs:8080/jsonrpc'
+CLIENT_ID = 'fill this in'
+CLIENT_SECRET = 'fill this in'

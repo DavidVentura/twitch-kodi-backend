@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "twitch_fapi_backend"
+version = "0.1.0"
+description = ""
+authors = ["david <davidventura27@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.71.0"
+httpx = "^0.21.3"
+streamlink = "^3.0.3"
+dynaconf = "^3.1.7"
+uvicorn = "^0.16.0"
+aiocache = "^0.11.1"
+ujson = "^5.1.0"
+lxml = "^4.7.1"
+wheel = "^0.37.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+mypy = "^0.931"
+flake8 = "^4.0.1"
+black = "^21.12b0"
+shiv = "^1.0.0"
+
+
+[tool.poetry.scripts]
+webserver = "twitch_fapi_backend.api:main"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
