@@ -5,12 +5,14 @@ import sys
 import aiocache
 import uvicorn
 
+from typing import Optional
+
 from twitch_fapi_backend.twitch import Twitch
 from twitch_fapi_backend import kodi
 from twitch_fapi_backend import tasks
 
 from dynaconf import settings
-from fastapi import FastAPI
+from fastapi import FastAPI, Path
 from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -63,6 +65,11 @@ async def cast_vod(vod_id: str):
 
 
 @app.get("/vods")
+async def all_vods():
+    return await t.get_vods_from_favorites()
+
+
+@app.get("/vods/{user}")
 async def vods(user: str):
     return await t.get_vods(user)
 
@@ -80,4 +87,5 @@ async def end():
     return None
 
 
-uvicorn.run(app, port=7777, host='0.0.0.0')
+def main():
+    uvicorn.run(app, port=7777, host='0.0.0.0')

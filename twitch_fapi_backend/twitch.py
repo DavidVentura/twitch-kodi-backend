@@ -91,6 +91,13 @@ class Twitch:
         data = self.streamlink.streams(query)
         return data["best"].url
 
+    async def get_vods_from_favorites(self):
+        vods = {}
+        for vod_user in settings.VOD_USERS:
+            vods[vod_user] = await self.get_vods(vod_user)
+        return vods
+
+    @aiocache.cached(ttl=1800)
     async def get_vods(self, username):
         url = f"https://api.twitch.tv/helix/videos"
         async with httpx.AsyncClient() as client:
