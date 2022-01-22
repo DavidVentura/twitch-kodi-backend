@@ -42,7 +42,7 @@ async def list_streams():
 
 @app.get("/streamable_url")
 async def streamable_url(user: str):
-    return await t.get_streamable_url(f"https://twitch.tv/{user}")
+    return {"url": await t.get_streamable_url(f"https://twitch.tv/{user}")}
 
 
 @app.get("/cast_live")
