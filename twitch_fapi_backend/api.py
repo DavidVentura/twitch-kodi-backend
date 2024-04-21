@@ -31,6 +31,7 @@ async def lifespan(app: FastAPI):
     global mqtt_client
     asyncio.create_task(t.get_token_forever())
     asyncio.create_task(tasks.store_progress())
+    asyncio.create_task(tasks.fetch_live_ccs_forever())
     while not t.ready:
         await asyncio.sleep(0.1)
 
@@ -78,6 +79,22 @@ async def list_streams():
 @app.get("/streamable_url")
 async def streamable_url(user: str):
     return {"url": await t.get_streamable_url(f"https://twitch.tv/{user}")}
+
+
+@app.get("/live_cc")
+async def live_cc():
+    ccs = await cache.get("live_ccs", [])
+    logger.info("got ccs %s", ccs)
+    return ccs
+
+
+@app.get("/cast_live_cc/{target}")
+async def cast_target(user: str, target: str):
+    stream_obj = await t.get_stream(user)
+    streamable_url = await t.get_streamable_url(f"https://twitch.tv/{user}")
+    logger.info("url %s", streamable_url)
+    await tasks.cast_to_chromecast(streamable_url, target)
+    return stream_obj
 
 
 @app.get("/cast_live")

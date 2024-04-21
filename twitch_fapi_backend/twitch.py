@@ -21,6 +21,8 @@ class Twitch:
 
     async def get_token_forever(self):
         while True:
+            if not self.ready:
+                logger.info("Getting twitch token for startup")
             async with httpx.AsyncClient() as client:
                 r = await client.post(
                     "https://id.twitch.tv/oauth2/token",
