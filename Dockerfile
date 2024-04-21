@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster
+FROM python:3.11.9-slim-bullseye
 RUN echo 'Acquire::http::Proxy "http://proxies.labs:3142/apt-cacher/";' > /etc/apt/apt.conf.d/01proxy
 RUN apt-get update && apt-get install --no-install-recommends -y make python3 python3-pip python3-distutils
 
