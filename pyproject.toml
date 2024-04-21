@@ -5,18 +5,19 @@ description = ""
 authors = ["david <davidventura27@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.11"
 fastapi = "^0.95.1"
 httpx = "^0.21.3"
-streamlink = "^3.0.3"
+streamlink = "6.5.1"
 dynaconf = "^3.1.7"
 uvicorn = "^0.16.0"
 aiocache = "^0.11.1"
 ujson = "^5.1.0"
-lxml = "^4.7.1"
 wheel = "^0.37.1"
 shiv = "^1.0.0"
 asyncio-mqtt = "^0.16.1"
+pychromecast = "^13.1.0"
+twitch-dota-layerth = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
