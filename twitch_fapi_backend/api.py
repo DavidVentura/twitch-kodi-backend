@@ -9,22 +9,26 @@ import uvicorn
 import asyncio_mqtt
 
 from contextlib import asynccontextmanager
-from typing import Optional
 
 from twitch_fapi_backend.twitch import Twitch
 from twitch_fapi_backend import kodi
 from twitch_fapi_backend import tasks
 
 from dynaconf import settings
-from fastapi import FastAPI, Path
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from twitch_dota_layerth.lib import API, Playing
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger()
 cache = aiocache.SimpleMemoryCache()
 t = Twitch(settings.CLIENT_ID, settings.CLIENT_SECRET)
-mqtt_client = None
 
+dota_api = API()
+heroes = {}
+items = {}
+mqtt_client = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,6 +36,11 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(t.get_token_forever())
     asyncio.create_task(tasks.store_progress())
     asyncio.create_task(tasks.fetch_live_ccs_forever())
+    global heroes
+    global items
+
+    items = await dota_api.fetch_items()
+    heroes = await dota_api.fetch_heroes()
     while not t.ready:
         await asyncio.sleep(0.1)
 
@@ -125,6 +134,14 @@ async def all_vods():
 async def vods(user: str):
     return await t.get_vods(user)
 
+
+@app.get("/dota_info/{channel_id}")
+async def dota_info(channel_id: int):
+    game_state = await dota_api.get_stream_status(channel_id)
+    if isinstance(game_state, Playing):
+        phd = game_state.process_data(heroes, items)
+        return phd
+    return None
 
 @app.get("/currently_casting")
 async def currently_casting():
