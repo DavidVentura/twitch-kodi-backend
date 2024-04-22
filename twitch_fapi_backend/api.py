@@ -18,7 +18,7 @@ from dynaconf import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from twitch_dota_layerth.lib import API, Playing
+from twitch_dota_extension.lib import API, Playing
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger()
@@ -141,7 +141,8 @@ async def dota_info(channel_id: int):
     if isinstance(game_state, Playing):
         phd = game_state.process_data(heroes, items)
         return phd
-    return None
+    else:
+        return {"error": "Bad api response"}
 
 @app.get("/currently_casting")
 async def currently_casting():

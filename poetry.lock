@@ -1243,14 +1243,14 @@ trio = ">=0.11"
 wsproto = ">=0.14"
 
 [[package]]
-name = "twitch-dota-layerth"
-version = "0.1.0"
-description = "Interact with the Layerth API for a given Twitch channel ID"
+name = "twitch-dota-extension"
+version = "0.1.1"
+description = "Interact with the Dota2 Extension API for a given Twitch channel ID"
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "twitch_dota_layerth-0.1.0-py3-none-any.whl", hash = "sha256:b6a6fd6ddc94d3d65b271e596fb35f5d41ad24681b41ce435525978e7acf3a09"},
-    {file = "twitch_dota_layerth-0.1.0.tar.gz", hash = "sha256:2d0bdfdd3576207ad72caec5975a1611e446f8e26300bbd0642550225383dcf6"},
+    {file = "twitch_dota_extension-0.1.1-py3-none-any.whl", hash = "sha256:0c2cd9becbb9a659a7831bb770cc8f88fd2a5a09ed453cf20198afedb5154f11"},
+    {file = "twitch_dota_extension-0.1.1.tar.gz", hash = "sha256:6618a462b1b7821e60b6804b14c4698ec6cfcb199e406dad7cce0d3490cf8639"},
 ]
 
 [package.dependencies]
@@ -1499,4 +1499,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "435b1b5e83d9a19ae5885cd1618f53364aa15a4f8e66f93a8b6114fb7ff7a03b"
+content-hash = "fedadf74c8e8bb4725c976ccf05bf07ea31a3817dc44b110ed0e332e073b22b2"
