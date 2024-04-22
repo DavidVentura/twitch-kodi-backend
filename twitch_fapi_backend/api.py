@@ -6,7 +6,7 @@ import enum
 import aiocache
 import uvicorn
 
-import asyncio_mqtt
+import aiomqtt
 
 from contextlib import asynccontextmanager
 
@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
     while not t.ready:
         await asyncio.sleep(0.1)
 
-    async with asyncio_mqtt.Client(hostname=settings.MQTT_HOST) as c:
+    async with aiomqtt.Client(hostname=settings.MQTT_HOST) as c:
         mqtt_client = c
         yield
 

@@ -15,7 +15,7 @@ aiocache = "^0.11.1"
 ujson = "^5.1.0"
 wheel = "^0.37.1"
 shiv = "^1.0.0"
-asyncio-mqtt = "^0.16.1"
+aiomqtt = "^1.0.0"
 pychromecast = "^13.1.0"
 twitch-dota-layerth = "^0.1.0"
 
