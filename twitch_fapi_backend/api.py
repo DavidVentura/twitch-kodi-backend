@@ -2,6 +2,9 @@ import asyncio
 import logging
 import sys
 import enum
+import typing
+
+from dataclasses import dataclass, asdict
 
 import aiocache
 import uvicorn
@@ -15,10 +18,11 @@ from twitch_fapi_backend import kodi
 from twitch_fapi_backend import tasks
 
 from dynaconf import settings
-from fastapi import FastAPI
+from fastapi import FastAPI, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from twitch_dota_extension.lib import API, Playing
+from twitch_dota_extension.lib import API, Playing, SpectatingTournament, ProcessedHeroData
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger()
@@ -28,7 +32,7 @@ t = Twitch(settings.CLIENT_ID, settings.CLIENT_SECRET)
 dota_api = API()
 heroes = {}
 items = {}
-mqtt_client = None
+mqtt_client: aiomqtt.Client | None = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -97,7 +101,7 @@ async def live_cc():
     return ccs
 
 
-@app.get("/cast_live_cc/{target}")
+@app.get("/cast_live_cc/{target}/{user}")
 async def cast_target(user: str, target: str):
     stream_obj = await t.get_stream(user)
     streamable_url = await t.get_streamable_url(f"https://twitch.tv/{user}")
@@ -135,14 +139,39 @@ async def vods(user: str):
     return await t.get_vods(user)
 
 
-@app.get("/dota_info/{channel_id}")
-async def dota_info(channel_id: int):
+@dataclass
+class DotaSingleResponse:
+    type: typing.Literal['single']
+    data: ProcessedHeroData
+
+@dataclass
+class DotaMultiResponse:
+    type: typing.Literal['multiple']
+    data: list[ProcessedHeroData]
+
+class DotaErrResponse(typing.TypedDict):
+    error: str
+    response: dict[str, typing.Any]
+    channel:  dict[str, typing.Any]
+
+@app.get("/dota_info/{channel_name}", responses={400:{"model": DotaErrResponse}})
+async def dota_info(channel_name: str) -> DotaSingleResponse | DotaMultiResponse:
+    channel = await t.get_user(channel_name)
+    try:
+        channel_id = int(channel['id'])
+    except Exception as e:
+        return {"error": f"Bad user id: {e}"}
+
     game_state = await dota_api.get_stream_status(channel_id)
     if isinstance(game_state, Playing):
-        phd = game_state.process_data(heroes, items)
-        return phd
-    else:
-        return {"error": "Bad api response"}
+        phd: ProcessedHeroData = game_state.process_data(heroes, items)
+        return DotaSingleResponse("single", phd)
+    if isinstance(game_state, SpectatingTournament):
+        phds: list[ProcessedHeroData] = game_state.process_data(heroes, items)
+        return DotaMultiResponse("multiple", phds)
+
+    err = {"error": "Bad api response", "response": asdict(game_state), "channel": channel}
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=err)
 
 @app.get("/currently_casting")
 async def currently_casting():
@@ -167,6 +196,7 @@ async def tv_power(power: Power):
 
 async def publish(comm: CecCommands):
     logger.info("Publishing %s to %s", comm.value, settings.CEC_TOPIC)
+    assert mqtt_client is not None
     res = await mqtt_client.publish(settings.CEC_TOPIC, comm.value)
     logger.info("Got %s", res)
     return res

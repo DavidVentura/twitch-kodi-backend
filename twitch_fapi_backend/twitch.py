@@ -70,7 +70,8 @@ class Twitch:
         url = "https://api.twitch.tv/helix/users"
         async with httpx.AsyncClient() as client:
             r = await client.get(url, params={"login": user}, headers=self.headers, timeout=5)
-        return r.json()["data"][0]
+        user = r.json()["data"][0]
+        return user
 
     @aiocache.cached(ttl=36000)
     async def get_avatar(self, user):
