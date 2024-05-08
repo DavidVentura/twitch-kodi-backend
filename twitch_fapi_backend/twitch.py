@@ -90,7 +90,7 @@ class Twitch:
             r = await client.get(url, params={"live_only": True, "query": query}, headers=self.headers)
         return r.json()
 
-    async def get_streamable_url(self, query):
+    async def get_streamable_url(self, query) -> str:
         data = self.streamlink.streams(query)
         return data["best"].url
 
