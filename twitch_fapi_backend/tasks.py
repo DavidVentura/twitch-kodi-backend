@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 
 import pychromecast
 import aiocache
@@ -68,10 +69,11 @@ async def fetch_live_ccs_forever():
                 if cc.friendly_name != pending_cast:
                     continue
                 logger.info("Found CC while looking to cast")
-                await _cast_to_chromecast(cc, zconf, pending_url)
+                await asyncio.to_thread(blocking_cast_to_chromecast, cc, zconf, pending_url)
         await asyncio.sleep(1)
 
-async def _cast_to_chromecast(ci: pychromecast.CastInfo, zconf: pychromecast.zeroconf.Zeroconf, url: str):
+# 
+def blocking_cast_to_chromecast(ci: pychromecast.CastInfo, zconf: pychromecast.zeroconf.Zeroconf, url: str):
     logger.info("Getting CC from CI %s", ci)
     cast = pychromecast.get_chromecast_from_cast_info(ci, zconf)
     logger.info("Connecting to %s", ci.friendly_name)
@@ -84,7 +86,7 @@ async def _cast_to_chromecast(ci: pychromecast.CastInfo, zconf: pychromecast.zer
     logger.info("Is active %s", ci.friendly_name)
 
     mc.pause()
-    await asyncio.sleep(1)
+    time.sleep(1)
     mc.play()
 
 async def cast_to_chromecast(url: str, cc_name: str):
