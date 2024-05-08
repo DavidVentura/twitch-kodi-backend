@@ -5,8 +5,10 @@ import enum
 import typing
 
 from dataclasses import dataclass, asdict
+from pydantic import BaseModel, Field
 
 import aiocache
+import httpx
 import uvicorn
 
 import aiomqtt
@@ -22,7 +24,7 @@ from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from twitch_dota_extension.lib import API, Playing, SpectatingTournament, ProcessedHeroData
+from twitch_dota_extension.lib import API, Playing, SpectatingTournament, ProcessedHeroData, TourProcessedHeroData
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger()
@@ -94,30 +96,32 @@ async def streamable_url(user: str):
     return {"url": await t.get_streamable_url(f"https://twitch.tv/{user}")}
 
 
-@app.get("/live_cc")
-async def live_cc():
+@app.get("/targets")
+async def targets():
     ccs = await cache.get("live_ccs", [])
     logger.info("got ccs %s", ccs)
-    return ccs
+    return ["Kodi"] + ccs
 
+async def _cast_url_to_target(url: str, target: str) -> bool:
+    if target == "Kodi":
+        logger.info("Casting %s to %s", url, target)
+        await kodi.cast(url)
+        return True
+    ccs: list[str] = await cache.get("live_ccs", [])
+    if target in ccs:
+        logger.info("Casting %s to %s", url, target)
+        await tasks.cast_to_chromecast(url, target)
+        return True
+    logger.info("Failed to casting %s to %s", url, target)
+    return False
 
-@app.get("/cast_live_cc/{target}/{user}")
-async def cast_target(user: str, target: str):
+@app.get("/cast_live/{target}/{user}")
+async def cast_live(user: str, target: str):
     stream_obj = await t.get_stream(user)
     streamable_url = await t.get_streamable_url(f"https://twitch.tv/{user}")
-    logger.info("url %s", streamable_url)
-    await tasks.cast_to_chromecast(streamable_url, target)
-    return stream_obj
-
-
-@app.get("/cast_live")
-async def cast(user: str):
-    stream_obj = await t.get_stream(user)
-    streamable_url = await t.get_streamable_url(f"https://twitch.tv/{user}")
-    await cache.set(streamable_url, stream_obj)
-    await kodi.cast(streamable_url)
-    return stream_obj
-
+    if await _cast_url_to_target(streamable_url, target):
+        return stream_obj
+    return {"error": "invalid target"}
 
 @app.get("/cast_vod")
 async def cast_vod(vod_id: str):
@@ -149,14 +153,27 @@ class DotaMultiResponse:
     type: typing.Literal['multiple']
     data: list[ProcessedHeroData]
 
+@dataclass
+class DotaMultiResponseTour:
+    type: typing.Literal['multiple']
+    data: list[TourProcessedHeroData]
+
+class DotaOkResponse(BaseModel):
+    __root__: DotaSingleResponse | DotaMultiResponse | DotaMultiResponseTour = Field(..., discriminator="type")
 class DotaErrResponse(typing.TypedDict):
     error: str
     response: dict[str, typing.Any]
     channel:  dict[str, typing.Any]
 
-@app.get("/dota_info/{channel_name}", responses={400:{"model": DotaErrResponse}})
-async def dota_info(channel_name: str) -> DotaSingleResponse | DotaMultiResponse:
-    channel = await t.get_user(channel_name)
+@app.get("/dota_info/{channel_name}", responses={200:{"model": DotaOkResponse}, 400:{"model": DotaErrResponse}})
+async def dota_info(channel_name: str):
+    try:
+        channel = await t.get_user(channel_name)
+    except httpx.ReadTimeout:
+        return {"error": "API timed out"}
+    except asyncio.exceptions.CancelledError:
+        return {"error": "API timed out"}
+
     try:
         channel_id = int(channel['id'])
     except Exception as e:
@@ -173,11 +190,31 @@ async def dota_info(channel_name: str) -> DotaSingleResponse | DotaMultiResponse
     err = {"error": "Bad api response", "response": asdict(game_state), "channel": channel}
     return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=err)
 
-@app.get("/currently_casting")
+class TwitchChannel(BaseModel):
+    user_id: str
+    user_login: str
+    user_name: str
+    game_id: str
+    game_name: str
+    type: typing.Literal['live']
+    title: str
+    thumbnail_url: str
+    avatar: str
+
+class FileInfo(BaseModel):
+    type: typing.Literal['file']
+    filename: str
+
+class CurrentlyCasting(BaseModel):
+    __root__: TwitchChannel | FileInfo  = Field(..., discriminator="type")
+
+@app.get("/currently_casting", responses={200:{"model": CurrentlyCasting}})
 async def currently_casting():
-    playing = await kodi.get_playing()
+    playing: None | str = await kodi.get_playing()
+    if playing is None:
+        return {"type": "file", "filename": "nothing"}
     got = await cache.get(playing)
-    return got or playing
+    return got or {"type": "file", "filename": playing}
 
 
 @app.get("/remote/input/{input}")
