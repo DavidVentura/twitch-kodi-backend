@@ -24,7 +24,7 @@ from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from twitch_dota_extension.lib import API, Playing, SpectatingTournament, ProcessedHeroData, TourProcessedHeroData
+from twitch_dota_extension.lib import API, Playing, SpectatingTournament, ProcessedHeroData, TourProcessedHeroData, SpectatingPglTournament
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger()
@@ -33,6 +33,7 @@ t = Twitch(settings.CLIENT_ID, settings.CLIENT_SECRET)
 
 dota_api = API()
 heroes = {}
+pgl_hero_map = {}
 items = {}
 mqtt_client: aiomqtt.Client | None = None
 
@@ -43,10 +44,12 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(tasks.store_progress())
     asyncio.create_task(tasks.fetch_live_ccs_forever())
     global heroes
+    global pgl_hero_map
     global items
 
     items = await dota_api.fetch_items()
     heroes = await dota_api.fetch_heroes()
+    pgl_hero_map = await dota_api.fetch_pgl_hero_mappings()
     while not t.ready:
         await asyncio.sleep(0.1)
 
@@ -151,7 +154,7 @@ class DotaSingleResponse:
 @dataclass
 class DotaMultiResponse:
     type: typing.Literal['multiple']
-    data: list[ProcessedHeroData]
+    data: list[TourProcessedHeroData]
 
 @dataclass
 class DotaMultiResponseTour:
@@ -183,8 +186,11 @@ async def dota_info(channel_name: str):
     if isinstance(game_state, Playing):
         phd: ProcessedHeroData = game_state.process_data(heroes, items)
         return DotaSingleResponse("single", phd)
-    if isinstance(game_state, SpectatingTournament):
-        phds: list[ProcessedHeroData] = game_state.process_data(heroes, items)
+    elif isinstance(game_state, SpectatingTournament):
+        phds: list[TourProcessedHeroData] = game_state.process_data(heroes, items)
+        return DotaMultiResponse("multiple", phds)
+    elif isinstance(game_state, SpectatingPglTournament):
+        phds: list[TourProcessedHeroData] = game_state.process_data(heroes, pgl_hero_map, items)
         return DotaMultiResponse("multiple", phds)
 
     err = {"error": "Bad api response", "response": asdict(game_state), "channel": channel}
