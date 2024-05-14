@@ -17,8 +17,8 @@ wheel = "^0.37.1"
 shiv = "^1.0.0"
 aiomqtt = "^1.0.0"
 pychromecast = "^13.1.0"
-# twitch-dota-extension = "^0.1.3"
-twitch-dota-extension = { path = "../twitch-dota-extension/", develop = true }
+twitch-dota-extension = "^0.1.4"
+# twitch-dota-extension = { path = "../twitch-dota-extension/", develop = true }
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
