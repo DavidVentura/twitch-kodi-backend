@@ -24,8 +24,9 @@ from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from twitch_dota_extension.lib import API, Playing, SpectatingTournament, ProcessedHeroData, TourProcessedHeroData, SpectatingPglTournament
+from twitch_dota_extension.lib import API, Playing, SpectatingTournament, Spectating, ProcessedHeroData, TourProcessedHeroData, SpectatingPglTournament
 
+WATCH_CACHE_KEY = 'watch_dotainfo'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger()
 cache = aiocache.SimpleMemoryCache()
@@ -40,6 +41,7 @@ mqtt_client: aiomqtt.Client | None = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global mqtt_client
+    asyncio.create_task(fill_watched_cache_forever())
     asyncio.create_task(t.get_token_forever())
     asyncio.create_task(tasks.store_progress())
     asyncio.create_task(tasks.fetch_live_ccs_forever())
@@ -168,8 +170,23 @@ class DotaErrResponse(typing.TypedDict):
     response: dict[str, typing.Any]
     channel:  dict[str, typing.Any]
 
-@app.get("/dota_info/{channel_name}", responses={200:{"model": DotaOkResponse}, 400:{"model": DotaErrResponse}})
-async def dota_info(channel_name: str):
+async def fill_watched_cache_forever():
+    while True:
+        logger.info("Updating dota info channel")
+        to_watch = await cache.get(WATCH_CACHE_KEY, set())
+        if len(to_watch) == 0:
+            await asyncio.sleep(1)
+            continue
+        for channel in list(to_watch): # prevent changing-during-iteration errors
+            # TODO: maybe parallel?
+            res = await get_dota_info(channel)
+            if res is not None:
+                CACHE_KEY = f'dotainfo_{channel}'
+                await cache.set(CACHE_KEY, res)
+        await asyncio.sleep(1)
+
+async def get_dota_info(channel_name: str):
+    channel_name = channel_name.lower()
     try:
         channel = await t.get_user(channel_name)
     except httpx.ReadTimeout:
@@ -180,21 +197,43 @@ async def dota_info(channel_name: str):
     try:
         channel_id = int(channel['id'])
     except Exception as e:
-        return {"error": f"Bad user id: {e}"}
+        logger.error("Bad user ID %s", channel_name)
+        return None
 
     game_state = await dota_api.get_stream_status(channel_id)
     if isinstance(game_state, Playing):
-        phd: ProcessedHeroData = game_state.process_data(heroes, items)
-        return DotaSingleResponse("single", phd)
+        phd: ProcessedHeroData = game_state.process_data(channel_name, heroes, items)
+        ret = DotaSingleResponse("single", phd)
+        return ret
+    elif isinstance(game_state, Spectating):
+        phds: list[TourProcessedHeroData] = game_state.process_data(heroes, items)
+        ret = DotaMultiResponse("multiple", phds)
+        return ret
     elif isinstance(game_state, SpectatingTournament):
         phds: list[TourProcessedHeroData] = game_state.process_data(heroes, items)
-        return DotaMultiResponse("multiple", phds)
+        ret = DotaMultiResponse("multiple", phds)
+        return ret
     elif isinstance(game_state, SpectatingPglTournament):
         phds: list[TourProcessedHeroData] = game_state.process_data(heroes, pgl_hero_map, items)
-        return DotaMultiResponse("multiple", phds)
+        ret = DotaMultiResponse("multiple", phds)
+        return ret
 
-    err = {"error": "Bad api response", "response": asdict(game_state), "channel": channel}
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=err)
+    logger.warning("Bad API response: %s", asdict(game_state))
+    return None
+
+@app.get("/dota_info/{channel_name}", responses={200:{"model": DotaOkResponse}, 400:{"model": DotaErrResponse}})
+async def dota_info(channel_name: str):
+    channel_name = channel_name.lower()
+    CACHE_KEY = f'dotainfo_{channel_name}'
+    to_watch = await cache.get(WATCH_CACHE_KEY, set())
+    to_watch.add(channel_name)
+    logger.info("Monitoring channels for info: %s", to_watch)
+    await cache.set(WATCH_CACHE_KEY, to_watch, 600)
+    got = await cache.get(CACHE_KEY)
+    if got:
+        return got
+
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=None)
 
 class TwitchChannel(BaseModel):
     user_id: str
