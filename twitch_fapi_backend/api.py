@@ -183,7 +183,7 @@ async def fill_watched_cache_forever():
             if res is not None:
                 CACHE_KEY = f'dotainfo_{channel}'
                 await cache.set(CACHE_KEY, res)
-        await asyncio.sleep(1)
+        await asyncio.sleep(10)
 
 async def get_dota_info(channel_name: str):
     channel_name = channel_name.lower()
