@@ -127,6 +127,7 @@ async def cast_live(user: str, target: str):
     stream_obj = await t.get_stream(user)
     streamable_url = await t.get_streamable_url(f"https://twitch.tv/{user}")
     if await _cast_url_to_target(streamable_url, target):
+        await cache.set(streamable_url, stream_obj)
         return stream_obj
     return {"error": "invalid target"}
 
