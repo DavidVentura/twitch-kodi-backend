@@ -24,7 +24,9 @@ from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from twitch_dota_extension.lib import API, Playing, SpectatingTournament, Spectating, ProcessedHeroData, TourProcessedHeroData, SpectatingPglTournament
+from twitch_dota_extension.lib import (API, Playing, SpectatingTournament, Spectating, ProcessedHeroData, TourProcessedHeroData, SpectatingPglTournament,
+        Source,
+        )
 
 WATCH_CACHE_KEY = 'watch_dotainfo'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -200,20 +202,26 @@ async def get_dota_info(channel_name: str):
         logger.error("Bad user ID %s", channel_name)
         return None
 
-    game_state = await dota_api.get_stream_status(channel_id)
+    stream_source_key = f'dota_stream_source_{channel_name}'
+    str_sour: Source | None = await cache.get(stream_source_key, None)
+    game_state = await dota_api.get_stream_status(channel_id, str_sour)
     if isinstance(game_state, Playing):
+        await cache.set(stream_source_key, Source.Streamer, 300)
         phd: ProcessedHeroData = game_state.process_data(channel_name, heroes, items)
         ret = DotaSingleResponse("single", phd)
         return ret
     elif isinstance(game_state, Spectating):
+        await cache.set(stream_source_key, Source.Streamer, 300)
         phds: list[TourProcessedHeroData] = game_state.process_data(heroes, items)
         ret = DotaMultiResponse("multiple", phds)
         return ret
     elif isinstance(game_state, SpectatingTournament):
+        await cache.set(stream_source_key, Source.Tournament, 300)
         phds: list[TourProcessedHeroData] = game_state.process_data(heroes, items)
         ret = DotaMultiResponse("multiple", phds)
         return ret
     elif isinstance(game_state, SpectatingPglTournament):
+        await cache.set(stream_source_key, Source.PGL, 3600)
         phds: list[TourProcessedHeroData] = game_state.process_data(heroes, pgl_hero_map, items)
         ret = DotaMultiResponse("multiple", phds)
         return ret
