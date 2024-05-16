@@ -782,13 +782,13 @@ files = [
 
 [[package]]
 name = "platformdirs"
-version = "4.2.1"
+version = "4.2.2"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "platformdirs-4.2.1-py3-none-any.whl", hash = "sha256:17d5a1161b3fd67b390023cb2d3b026bbd40abde6fdb052dfbd3a29c3ba22ee1"},
-    {file = "platformdirs-4.2.1.tar.gz", hash = "sha256:031cd18d4ec63ec53e82dceaac0417d218a6863f7745dfcc9efe7793b7039bdf"},
+    {file = "platformdirs-4.2.2-py3-none-any.whl", hash = "sha256:2d7a1657e36a80ea911db832a8a6ece5ee53d8de21edd5cc5879af6530b1bfee"},
+    {file = "platformdirs-4.2.2.tar.gz", hash = "sha256:38b7b51f512eed9e84a22788b4bce1de17c0adb134d6becb09836e37d8654cd3"},
 ]
 
 [package.extras]
@@ -1194,13 +1194,13 @@ files = [
 
 [[package]]
 name = "trio"
-version = "0.25.0"
+version = "0.25.1"
 description = "A friendly Python library for async concurrency and I/O"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "trio-0.25.0-py3-none-any.whl", hash = "sha256:e6458efe29cc543e557a91e614e2b51710eba2961669329ce9c862d50c6e8e81"},
-    {file = "trio-0.25.0.tar.gz", hash = "sha256:9b41f5993ad2c0e5f62d0acca320ec657fdb6b2a2c22b8c7aed6caf154475c4e"},
+    {file = "trio-0.25.1-py3-none-any.whl", hash = "sha256:e42617ba091e7b2e50c899052e83a3c403101841de925187f61e7b7eaebdf3fb"},
+    {file = "trio-0.25.1.tar.gz", hash = "sha256:9f5314f014ea3af489e77b001861c535005c3858d38ec46b6b071ebfa339d7fb"},
 ]
 
 [package.dependencies]
@@ -1228,13 +1228,13 @@ wsproto = ">=0.14"
 
 [[package]]
 name = "twitch-dota-extension"
-version = "0.1.4"
-description = "Interact with the Dota2 Extension API for a given Twitch channel ID"
+version = "0.1.5"
+description = "Interact with the Twitch Extension APIs 'Dota2' and 'PGL' for a given Twitch channel ID"
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "twitch_dota_extension-0.1.4-py3-none-any.whl", hash = "sha256:071587c95f7afde0467a4bbaa9ac98b00e0ca38e5137ae249948cf15a7861c4a"},
-    {file = "twitch_dota_extension-0.1.4.tar.gz", hash = "sha256:13f4cdc88edf61b7052a380af8519c248a29aef31bc39f83793f11777e14b2a6"},
+    {file = "twitch_dota_extension-0.1.5-py3-none-any.whl", hash = "sha256:c3e17c216ffa4ec1b5906f716ce353bd90fcba4c0d7b672d276384f65d69386f"},
+    {file = "twitch_dota_extension-0.1.5.tar.gz", hash = "sha256:45eeb59510d233ceb5e66b18273cbf16fd15b32220b244e656a65fb58fd626ae"},
 ]
 
 [package.dependencies]
@@ -1496,4 +1496,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "92dc6013718bcc44e25563b09def12092a1341b5a714f09a290468e1bca45b50"
+content-hash = "e2731c6a845034f2d95da5f404a58b9ff04a6b081a943ddf44fd8e196cc5a1ea"
