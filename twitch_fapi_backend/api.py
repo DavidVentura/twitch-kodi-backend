@@ -53,7 +53,11 @@ async def lifespan(app: FastAPI):
 
     items = await dota_api.fetch_items()
     heroes = await dota_api.fetch_heroes()
-    pgl_hero_map = await dota_api.fetch_pgl_hero_mappings()
+    try:
+        pgl_hero_map = await dota_api.fetch_pgl_hero_mappings()
+    except httpx.TimeoutException as e:
+        logger.error("Failed to fetch PGL hero map: %s", e)
+        pgl_hero_map = {}
     while not t.ready:
         await asyncio.sleep(0.1)
 
@@ -128,6 +132,10 @@ async def cast_live(user: str, target: str):
     streamable_url = await t.get_streamable_url(f"https://twitch.tv/{user}")
     if await _cast_url_to_target(streamable_url, target):
         await cache.set(streamable_url, stream_obj)
+        to_watch = await cache.get(WATCH_CACHE_KEY, set())
+        to_watch.add(user)
+        logger.info("Monitoring channels for info: %s", to_watch)
+        await cache.set(WATCH_CACHE_KEY, to_watch, 3600)
         return stream_obj
     return {"error": "invalid target"}
 
@@ -237,7 +245,7 @@ async def dota_info(channel_name: str):
     to_watch = await cache.get(WATCH_CACHE_KEY, set())
     to_watch.add(channel_name)
     logger.info("Monitoring channels for info: %s", to_watch)
-    await cache.set(WATCH_CACHE_KEY, to_watch, 600)
+    await cache.set(WATCH_CACHE_KEY, to_watch, 3600)
     got = await cache.get(CACHE_KEY)
     if got:
         return got
