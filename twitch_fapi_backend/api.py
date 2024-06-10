@@ -270,11 +270,11 @@ class FileInfo(BaseModel):
 class CurrentlyCasting(BaseModel):
     __root__: TwitchChannel | FileInfo  = Field(..., discriminator="type")
 
-@app.get("/currently_casting", responses={200:{"model": CurrentlyCasting}})
+@app.get("/currently_casting", responses={200:{"model": CurrentlyCasting|None}})
 async def currently_casting():
     playing: None | str = await kodi.get_playing()
     if playing is None:
-        return {"type": "file", "filename": "nothing"}
+        return None
     got = await cache.get(playing)
     return got or {"type": "file", "filename": playing}
 
