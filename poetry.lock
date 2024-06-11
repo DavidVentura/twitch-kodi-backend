@@ -576,13 +576,9 @@ files = [
     {file = "lxml-5.2.2-cp36-cp36m-win_amd64.whl", hash = "sha256:edcfa83e03370032a489430215c1e7783128808fd3e2e0a3225deee278585196"},
     {file = "lxml-5.2.2-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:28bf95177400066596cdbcfc933312493799382879da504633d16cf60bba735b"},
     {file = "lxml-5.2.2-cp37-cp37m-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:3a745cc98d504d5bd2c19b10c79c61c7c3df9222629f1b6210c0368177589fb8"},
-    {file = "lxml-5.2.2-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1b590b39ef90c6b22ec0be925b211298e810b4856909c8ca60d27ffbca6c12e6"},
     {file = "lxml-5.2.2-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b336b0416828022bfd5a2e3083e7f5ba54b96242159f83c7e3eebaec752f1716"},
-    {file = "lxml-5.2.2-cp37-cp37m-manylinux_2_28_aarch64.whl", hash = "sha256:c2faf60c583af0d135e853c86ac2735ce178f0e338a3c7f9ae8f622fd2eb788c"},
     {file = "lxml-5.2.2-cp37-cp37m-manylinux_2_28_x86_64.whl", hash = "sha256:4bc6cb140a7a0ad1f7bc37e018d0ed690b7b6520ade518285dc3171f7a117905"},
-    {file = "lxml-5.2.2-cp37-cp37m-musllinux_1_1_aarch64.whl", hash = "sha256:7ff762670cada8e05b32bf1e4dc50b140790909caa8303cfddc4d702b71ea184"},
     {file = "lxml-5.2.2-cp37-cp37m-musllinux_1_1_x86_64.whl", hash = "sha256:57f0a0bbc9868e10ebe874e9f129d2917750adf008fe7b9c1598c0fbbfdde6a6"},
-    {file = "lxml-5.2.2-cp37-cp37m-musllinux_1_2_aarch64.whl", hash = "sha256:a6d2092797b388342c1bc932077ad232f914351932353e2e8706851c870bca1f"},
     {file = "lxml-5.2.2-cp37-cp37m-musllinux_1_2_x86_64.whl", hash = "sha256:60499fe961b21264e17a471ec296dcbf4365fbea611bf9e303ab69db7159ce61"},
     {file = "lxml-5.2.2-cp37-cp37m-win32.whl", hash = "sha256:d9b342c76003c6b9336a80efcc766748a333573abf9350f4094ee46b006ec18f"},
     {file = "lxml-5.2.2-cp37-cp37m-win_amd64.whl", hash = "sha256:b16db2770517b8799c79aa80f4053cd6f8b716f21f8aca962725a9565ce3ee40"},
@@ -1231,13 +1227,13 @@ wsproto = ">=0.14"
 
 [[package]]
 name = "twitch-dota-extension"
-version = "0.1.8"
+version = "0.1.9"
 description = "Interact with the Twitch Extension APIs 'Dota2' and 'PGL' for a given Twitch channel ID"
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "twitch_dota_extension-0.1.8-py3-none-any.whl", hash = "sha256:d73f61b7b62d29c95b791b6a245c925257b0a31cbe8bc21387a2c8eba44fc021"},
-    {file = "twitch_dota_extension-0.1.8.tar.gz", hash = "sha256:f448a9b0975c6a5d8c8b6f7226f4c322f65e1a7c5be8c75140d8695a05b39232"},
+    {file = "twitch_dota_extension-0.1.9-py3-none-any.whl", hash = "sha256:7219d8f53fe389d09da4144315a759d2ef3273c48ac605da2a2a5684e134254c"},
+    {file = "twitch_dota_extension-0.1.9.tar.gz", hash = "sha256:6dd8150aa0a873f5820f811d57eb4bb3f91eb7f628cdadf83a3b4a21d8e4941f"},
 ]
 
 [package.dependencies]
@@ -1499,4 +1495,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "eac028a6639ad05ce078ededd0cb9edd6902826b70090ce8f2a2fee7dbee03f0"
+content-hash = "d955035438c5932a8000cdae979045e834a3cd45d6bed33cf18271c778978b11"
