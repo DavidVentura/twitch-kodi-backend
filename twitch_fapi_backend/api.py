@@ -190,7 +190,13 @@ async def fill_watched_cache_forever():
             continue
         for channel in list(to_watch): # prevent changing-during-iteration errors
             # TODO: maybe parallel?
-            res = await get_dota_info(channel)
+            try:
+                res = await get_dota_info(channel)
+            except Exception as e:
+                logger.exception(e)
+                await asyncio.sleep(10)
+                continue
+
             if res is not None:
                 CACHE_KEY = f'dotainfo_{channel}'
                 await cache.set(CACHE_KEY, res)
