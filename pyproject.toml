@@ -7,7 +7,7 @@ authors = ["david <davidventura27@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.95.1"
-httpx = "^0.21.3"
+httpx = "^0.27.2"
 streamlink = "6.5.1"
 dynaconf = "^3.1.7"
 uvicorn = "^0.16.0"
@@ -17,7 +17,7 @@ wheel = "^0.37.1"
 shiv = "^1.0.0"
 aiomqtt = "^1.0.0"
 pychromecast = "^13.1.0"
-twitch-dota-extension = "^0.1.9"
+twitch-dota-extension = "^0.1.10"
 #twitch-dota-extension = { path = "../twitch-dota-extension/", develop = true }
 
 [tool.poetry.dev-dependencies]
