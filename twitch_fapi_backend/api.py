@@ -58,6 +58,10 @@ async def lifespan(app: FastAPI):
     except httpx.TimeoutException as e:
         logger.error("Failed to fetch PGL hero map: %s", e)
         pgl_hero_map = {}
+    except Exception as e:
+        logger.error("Failed HARD to fetch PGL hero map: %s", e)
+        pgl_hero_map = {}
+
     while not t.ready:
         await asyncio.sleep(0.1)
 
