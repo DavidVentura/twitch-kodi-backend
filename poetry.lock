@@ -1239,13 +1239,13 @@ wsproto = ">=0.14"
 
 [[package]]
 name = "twitch-dota-extension"
-version = "0.1.11"
+version = "0.1.12"
 description = "Interact with the Twitch Extension APIs 'Dota2' and 'PGL' for a given Twitch channel ID"
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "twitch_dota_extension-0.1.11-py3-none-any.whl", hash = "sha256:e97a5c82575016d11e4c2b30ac5e1ebc77990d372da3a04af801556bcab8ba8f"},
-    {file = "twitch_dota_extension-0.1.11.tar.gz", hash = "sha256:d675ca26c7053da940ebf860631db3eab8ad24a38105eb60de10c24e0096bb3a"},
+    {file = "twitch_dota_extension-0.1.12-py3-none-any.whl", hash = "sha256:6bbdf250c51560a616578adbb018eb4c7b7c16c23e73e1b1414f7a7d1b449473"},
+    {file = "twitch_dota_extension-0.1.12.tar.gz", hash = "sha256:4f0269c16fe84d091a2bf8e563f11b9e9f3d0c9f467589b4cca9659ce7bb3047"},
 ]
 
 [package.dependencies]
@@ -1524,4 +1524,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "8540cc3c455cccf6512005f170a15de9e51e4b7e6c806b208f93e4526ac53007"
+content-hash = "c3e56b5505acbc23d15223dd10c3c810e3b7a0fc45d17c1479bcb5b896cb63e7"
