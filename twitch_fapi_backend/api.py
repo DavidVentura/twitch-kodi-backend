@@ -197,6 +197,7 @@ async def fill_watched_cache_forever():
             try:
                 res = await get_dota_info(channel)
             except Exception as e:
+                logger.error("Non-fatal error when fetching dota-info, logging and waiting 10s")
                 logger.exception(e)
                 await asyncio.sleep(10)
                 continue
