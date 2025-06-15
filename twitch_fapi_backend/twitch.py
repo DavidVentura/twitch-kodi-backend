@@ -70,6 +70,9 @@ class Twitch:
         url = "https://api.twitch.tv/helix/users"
         async with httpx.AsyncClient() as client:
             r = await client.get(url, params={"login": user}, headers=self.headers, timeout=5)
+        if not r.is_success:
+            logger.error("failed to get user: %s", r.text)
+            raise ValueError(f"Failed to get user from twitch {user}")
         user = r.json()["data"][0]
         return user
 

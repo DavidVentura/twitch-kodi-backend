@@ -208,6 +208,7 @@ async def fill_watched_cache_forever():
         await asyncio.sleep(10)
 
 async def get_dota_info(channel_name: str):
+    logger.info("Getting channel info for %s", channel_name)
     channel_name = channel_name.lower()
     try:
         channel = await t.get_user(channel_name)
@@ -226,21 +227,25 @@ async def get_dota_info(channel_name: str):
     str_sour: Source | None = await cache.get(stream_source_key, None)
     game_state = await dota_api.get_stream_status(channel_id, str_sour)
     if isinstance(game_state, Playing):
+        logger.info("channel %s is playing", channel_name)
         await cache.set(stream_source_key, Source.Streamer, 300)
         phd: ProcessedHeroData = game_state.process_data(channel_name, heroes, items)
         ret = DotaSingleResponse("single", phd)
         return ret
     elif isinstance(game_state, Spectating):
+        logger.info("channel %s is spectating", channel_name)
         await cache.set(stream_source_key, Source.Streamer, 300)
         phds: list[TourProcessedHeroData] = game_state.process_data(heroes, items)
         ret = DotaMultiResponse("multiple", phds)
         return ret
     elif isinstance(game_state, SpectatingTournament):
+        logger.info("channel %s is spectating tour", channel_name)
         await cache.set(stream_source_key, Source.Tournament, 300)
         phds: list[TourProcessedHeroData] = game_state.process_data(heroes, items)
         ret = DotaMultiResponse("multiple", phds)
         return ret
     elif isinstance(game_state, SpectatingPglTournament):
+        logger.info("channel %s is spectating PGL tour", channel_name)
         await cache.set(stream_source_key, Source.PGL, 3600)
         phds: list[TourProcessedHeroData] = game_state.process_data(heroes, pgl_hero_map, items)
         ret = DotaMultiResponse("multiple", phds)
